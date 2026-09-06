@@ -1,12 +1,10 @@
 {
-  "name": "Global Crypto Chaos",
-  "short_name": "Crypto Chaos",
+  "name": "CHAOS AGENT",
+  "short_name": "CHAOS",
   "start_url": "./",
-  "scope": "./",
   "display": "standalone",
   "background_color": "#020407",
   "theme_color": "#020407",
-  "description": "Live multi-exchange crypto market chaos visualization",
   "icons": [
     {
       "src": "./icons/icon-192.png",

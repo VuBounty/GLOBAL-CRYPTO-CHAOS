@@ -1,47 +1,31 @@
-# ⌬ GLOBAL CRYPTO CHAOS
+# CHAOS AGENT v1.0
 
-Live, installable PWA that turns multi-venue crypto market activity into a dynamic chaos field.
+Autonomous multi-strategy **paper trading** layer built on GLOBAL CRYPTO CHAOS.
 
-## Live data layers
-- Binance Spot: all-market mini tickers
-- Binance Futures: liquidation stream
-- Coinbase Exchange: BTC / ETH / SOL live ticker
-- Kraken: BTC / ETH / SOL ticker
-- OKX: BTC / ETH / SOL ticker
-- CoinGecko: global market cap, 24h volume, BTC/ETH dominance
+## Included
+- Multi-venue public live telemetry: Binance Spot, Binance Futures liquidations, Coinbase, Kraken, OKX
+- CoinGecko global aggregate
+- Cross-venue BTC/ETH/SOL price normalization
+- Market regime classification
+- Strategy swarm: momentum, mean reversion, liquidation reversal, cross-venue divergence
+- Meta-agent ensemble decision
+- Cost gate: modeled fee + slippage must leave positive expected edge
+- Deterministic risk governor
+- Paper execution: position sizing, stop, take-profit, time exit, signal flip exit
+- 0.25% equity risk per trade
+- 2% daily paper kill switch
+- Persistent local paper ledger
+- Equity, P&L, max drawdown, win rate, profit factor
+- GitHub Pages / PWA ready
 
-No private wallet connection. No trading. No API key required for this build.
+## Important
+This release deliberately DOES NOT place real orders. It is an evidence-generation build.
+No claim of superior performance is made until forward paper/live-small results demonstrate it.
+Browser-only public feeds are not a complete view of all global crypto transactions.
 
-## Important accuracy note
-This app visualizes a broad public sample of major global crypto venues. It does **not** literally capture every transaction on every centralized exchange, DEX, blockchain, OTC venue, or private venue worldwide. Nodes are normalized market events, not a claim of complete transaction-level global coverage.
-
-The current `FLOW PRESSURE`, `MARKET PULSE`, `ANOMALY CLUSTERS`, and `SIGNAL` fields are heuristics for visualization, not validated trading signals.
-
-## Local run
-```bash
+## Run
 python3 -m http.server 8080
-```
-Open `http://localhost:8080`.
+Open http://localhost:8080
 
-## GitHub Pages
-1. Create a repo, e.g. `GLOBAL-CRYPTO-CHAOS`.
-2. Push all files in this folder to branch `main`.
-3. GitHub → Settings → Pages → Source → GitHub Actions.
-4. The included `.github/workflows/pages.yml` deploys automatically.
-
-## Install on phone
-After GitHub Pages is live:
-- iPhone: Safari → Share → Add to Home Screen
-- Android/Chrome: Install App / Add to Home Screen
-
-## Production roadmap
-To move from "broad market telemetry" toward a true global market observatory:
-- backend event normalizer
-- more CEX venues
-- derivatives funding / OI / basis
-- DEX swaps and liquidity
-- on-chain whale and stablecoin flows
-- cross-venue latency and divergence
-- persistent historical store
-- replay/backtest mode
-- validated anomaly scoring
+## Publish
+Commit all files to VuBounty/GLOBAL-CRYPTO-CHAOS and GitHub Pages will deploy via .github/workflows/pages.yml.

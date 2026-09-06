@@ -40,3 +40,13 @@ footer{position:fixed;z-index:4;left:16px;right:16px;bottom:max(14px,env(safe-ar
  .tape{left:8px;right:8px;bottom:42px;height:58px}
  footer{left:8px;right:8px;font-size:7px}
 }
+
+.tag{font-size:9px;color:var(--warn);border:1px solid #4d4430;border-radius:5px;padding:2px 5px;margin-left:6px}
+.agent{right:16px;bottom:58px}
+.decision{margin:8px auto 0;max-width:520px;font-size:10px;color:#9eb0bb;line-height:1.5}
+.strategybar{position:fixed;z-index:4;left:50%;transform:translateX(-50%);top:58px;display:flex;gap:7px;flex-wrap:wrap;justify-content:center;width:min(620px,45vw)}
+.strategybar span{padding:5px 7px;border:1px solid rgba(80,120,140,.22);border-radius:6px;background:rgba(2,7,12,.62);font-size:8px;color:#81939f}
+.strategybar .hot{color:var(--good);border-color:rgba(124,255,181,.35)}
+.strategybar .cold{color:var(--bad);border-color:rgba(255,111,136,.35)}
+.control{position:fixed;right:126px;bottom:48px;z-index:8;padding:10px 12px;border:1px solid #425a68;border-radius:9px;background:#071019;color:#dce7ee;font:inherit}
+@media(max-width:1100px){.strategybar{display:none}.agent{display:none}}
