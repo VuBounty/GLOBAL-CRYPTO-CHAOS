@@ -21,7 +21,7 @@ function pct(n,d=2){return Number.isFinite(n)?(n>=0?"+":"")+n.toFixed(d)+"%":"â€
 function venue(id,state){venueState[id]=state;const el=$("v-"+id);el.textContent=state?"LIVE":"OFF";el.className=state?"live":"error";updateMaster()}
 function updateMaster(){const n=Object.values(venueState).filter(Boolean).length;$("masterDot").className=n>=3?"live":n===0?"error":"";$("masterStatus").textContent=n>=3?"MULTI-FEED LIVE":n>0?"PARTIAL LIVE":"RECONNECTING"}
 function j(type,msg,kind="",val=""){journal.unshift({t:Date.now(),type,msg,kind,val});journal=journal.slice(0,60);$("journal").innerHTML=journal.map(x=>`<div class="jrow ${x.kind}"><span class="time">${new Date(x.t).toLocaleTimeString()}</span><span class="type">${x.type}</span><span class="msg">${x.msg}</span><span class="val">${x.val||""}</span></div>`).join("")}
-function spawn(symbol,vol,pctv,boost=1){const a=(h(symbol)%6283)/1000,base=Math.min(W,H)*.11,spread=Math.min(W,H)*.36,rr=base+Math.random()*spread,side=pctv>=0?1:-1,q=Math.max(1,vol||1);pts.push({x:W/2+Math.cos(a)*rr,y:H/2+Math.sin(a)*rr,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.min(14,(1.3+Math.log10(q)*.72)*boost),life:1,side});if(pts.length>1800)pts.splice(0,350)}
+function spawn(symbol,vol,pctv,boost=1){const a=(h(symbol)%6283)/1000,base=Math.min(W,H)*.11,spread=Math.min(W,H)*.36,rr=base+Math.random()*spread,side=pctv>=0?1:-1,q=Math.max(1,vol||1);if(Math.random()<.22)chaosParticle(side,Math.min(1.6,.45+Math.log10(q+1)/6));pts.push({x:W/2+Math.cos(a)*rr,y:H/2+Math.sin(a)*rr,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.min(14,(1.3+Math.log10(q)*.72)*boost),life:1,side});if(pts.length>1800)pts.splice(0,350)}
 function draw(){ctx.fillStyle="rgba(2,4,7,.16)";ctx.fillRect(0,0,W,H);const cx=W/2,cy=H/2;ctx.strokeStyle="rgba(90,140,160,.035)";for(let r=90;r<Math.min(W,H)*.5;r+=90){ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke()}for(const p of pts){const dx=p.x-cx,dy=p.y-cy,d=Math.hypot(dx,dy)||1;p.vx+=(-dy/d)*.0025;p.vy+=(dx/d)*.0025;p.x+=p.vx;p.y+=p.vy;p.life*=.993;ctx.beginPath();ctx.arc(p.x,p.y,p.r*Math.max(.25,p.life),0,Math.PI*2);ctx.fillStyle=p.side>0?`rgba(100,255,185,${.08+.4*p.life})`:`rgba(255,105,135,${.08+.4*p.life})`;ctx.fill()}pts=pts.filter(p=>p.life>.04);$("clusters").textContent=Math.floor(pts.filter(p=>p.r>8&&p.life>.25).length/9)+" anomaly clusters";requestAnimationFrame(draw)}draw();
 
 function tickPrice(asset,p,source){
@@ -132,10 +132,74 @@ function engineTick(){
 async function fetchGlobal(){try{const r=await fetch("https://api.coingecko.com/api/v3/global",{cache:"no-store"});if(!r.ok)throw 0;const d=(await r.json()).data;$("marketCap").textContent=usd(d.total_market_cap?.usd);$("volume24h").textContent=usd(d.total_volume?.usd);$("btcDom").textContent=(d.market_cap_percentage?.btc??0).toFixed(1)+"%";$("ethDom").textContent=(d.market_cap_percentage?.eth??0).toFixed(1)+"%";$("aggregateStamp").textContent="COINGECKO GLOBAL Â· "+new Date().toLocaleTimeString()}catch(e){$("aggregateStamp").textContent="GLOBAL AGGREGATE TEMPORARILY UNAVAILABLE"}}fetchGlobal();setInterval(fetchGlobal,60000);
 
 function startBinanceSpot(){const ws=new WebSocket("wss://stream.binance.com:9443/ws/!miniTicker@arr");ws.onopen=()=>{venue("binance",true);j("FEED","Binance Spot connected","good")};ws.onmessage=e=>{let a;try{a=JSON.parse(e.data)}catch(_){return}if(!Array.isArray(a))return;for(const q of a.slice(0,220)){const p=+q.c,o=+q.o,v=+q.q;if(!p||!o)continue;const pc=(p-o)/o*100;flow=.988*flow+.012*(pc>=0?1:-1);syms.add("B:"+q.s);spawn(q.s,v,pc);events++;if(q.s==="BTCUSDT")tickPrice("BTC",p,"binance");if(q.s==="ETHUSDT")tickPrice("ETH",p,"binance");if(q.s==="SOLUSDT")tickPrice("SOL",p,"binance")}engineTick()};ws.onerror=()=>venue("binance",false);ws.onclose=()=>{venue("binance",false);setTimeout(startBinanceSpot,2500)}}
-function startFutures(){const ws=new WebSocket("wss://fstream.binance.com/ws/!forceOrder@arr");ws.onopen=()=>{venue("futures",true);j("FEED","Binance Futures liquidations connected","good")};ws.onmessage=e=>{let x;try{x=JSON.parse(e.data)}catch(_){return}const o=x.o||x;if(!o||!o.s)return;const p=+o.ap||+o.p||0,qty=+o.q||0,val=p*qty;liqValue+=val;events++;if(o.S==="SELL")liqSell+=val;else liqBuy+=val;liqBuy*=.998;liqSell*=.998;spawn("LQ:"+o.s,val,o.S==="SELL"?-1:1,1.5);if(val>100000)j("LIQUIDATION",`${o.s} ${o.S||""}`,o.S==="SELL"?"bad":"good",usd(val));engineTick()};ws.onerror=()=>venue("futures",false);ws.onclose=()=>{venue("futures",false);setTimeout(startFutures,3000)}}
+function startFutures(){const ws=new WebSocket("wss://fstream.binance.com/ws/!forceOrder@arr");ws.onopen=()=>{venue("futures",true);j("FEED","Binance Futures liquidations connected","good")};ws.onmessage=e=>{let x;try{x=JSON.parse(e.data)}catch(_){return}const o=x.o||x;if(!o||!o.s)return;const p=+o.ap||+o.p||0,qty=+o.q||0,val=p*qty;liqValue+=val;events++;heroWave(o.S==="SELL"?-1:1,Math.min(2.2,.7+Math.log10(val+1)/7));for(let z=0;z<Math.min(18,2+Math.floor(Math.log10(val+1)*2));z++)chaosParticle(o.S==="SELL"?-1:1,1.2);if(o.S==="SELL")liqSell+=val;else liqBuy+=val;liqBuy*=.998;liqSell*=.998;spawn("LQ:"+o.s,val,o.S==="SELL"?-1:1,1.5);if(val>100000)j("LIQUIDATION",`${o.s} ${o.S||""}`,o.S==="SELL"?"bad":"good",usd(val));engineTick()};ws.onerror=()=>venue("futures",false);ws.onclose=()=>{venue("futures",false);setTimeout(startFutures,3000)}}
 function startCoinbase(){const ws=new WebSocket("wss://ws-feed.exchange.coinbase.com");ws.onopen=()=>{venue("coinbase",true);ws.send(JSON.stringify({type:"subscribe",product_ids:["BTC-USD","ETH-USD","SOL-USD"],channels:["ticker"]}));j("FEED","Coinbase ticker connected","good")};ws.onmessage=e=>{let x;try{x=JSON.parse(e.data)}catch(_){return}if(x.type!=="ticker")return;const p=+x.price,v=(+x.last_size||0)*p,side=x.side==="buy"?1:-1,a=x.product_id.split("-")[0];flow=.995*flow+.005*side;tickPrice(a,p,"coinbase");syms.add("C:"+x.product_id);spawn("C:"+x.product_id,v,side,.7);events++};ws.onerror=()=>venue("coinbase",false);ws.onclose=()=>{venue("coinbase",false);setTimeout(startCoinbase,3500)}}
 function startKraken(){const ws=new WebSocket("wss://ws.kraken.com/v2");ws.onopen=()=>{venue("kraken",true);ws.send(JSON.stringify({method:"subscribe",params:{channel:"ticker",symbol:["BTC/USD","ETH/USD","SOL/USD"]}}));j("FEED","Kraken ticker connected","good")};ws.onmessage=e=>{let x;try{x=JSON.parse(e.data)}catch(_){return}if(x.channel!=="ticker"||!Array.isArray(x.data))return;for(const q of x.data){const p=+q.last||0,a=q.symbol.split("/")[0];tickPrice(a,p,"kraken");syms.add("K:"+q.symbol);spawn("K:"+q.symbol,(+q.volume||1)*p,Math.random()-.5,.55);events++}};ws.onerror=()=>venue("kraken",false);ws.onclose=()=>{venue("kraken",false);setTimeout(startKraken,4000)}}
 function startOkx(){const ws=new WebSocket("wss://ws.okx.com:8443/ws/v5/public");ws.onopen=()=>{venue("okx",true);ws.send(JSON.stringify({op:"subscribe",args:[{channel:"tickers",instId:"BTC-USDT"},{channel:"tickers",instId:"ETH-USDT"},{channel:"tickers",instId:"SOL-USDT"}]}));j("FEED","OKX ticker connected","good")};ws.onmessage=e=>{let x;try{x=JSON.parse(e.data)}catch(_){return}if(!x.arg||x.arg.channel!=="tickers"||!Array.isArray(x.data))return;for(const q of x.data){const p=+q.last||0,o=+q.open24h||p,a=q.instId.split("-")[0],pc=o?(p-o)/o*100:0;tickPrice(a,p,"okx");syms.add("O:"+q.instId);spawn("O:"+q.instId,+q.volCcy24h||1,pc,.55);events++}};ws.onerror=()=>venue("okx",false);ws.onclose=()=>{venue("okx",false);setTimeout(startOkx,4500)}}
+
+
+// ===== CHAOS SIGNATURE VISUAL FIELD =====
+const heroCv=$("chaosHero"),hctx=heroCv.getContext("2d",{alpha:false});
+let HW=0,HH=0,HDPR=1,hparts=[],waves=[],heroLastSpawn=0;
+function resizeHero(){
+  const r=heroCv.getBoundingClientRect();HDPR=Math.max(1,Math.min(2,devicePixelRatio||1));HW=r.width;HH=r.height;
+  heroCv.width=HW*HDPR;heroCv.height=HH*HDPR;hctx.setTransform(HDPR,0,0,HDPR,0,0);
+}
+addEventListener("resize",resizeHero);resizeHero();
+
+function chaosParticle(side=1,force=1){
+  const cx=HW/2,cy=HH/2;
+  const a=Math.random()*Math.PI*2,rad=55+Math.random()*Math.min(HW,HH)*.43;
+  const tangent=a+(side>0?1:-1)*Math.PI/2;
+  hparts.push({
+    x:cx+Math.cos(a)*rad,y:cy+Math.sin(a)*rad,
+    vx:Math.cos(tangent)*(0.15+Math.random()*.8)*force+(Math.random()-.5)*.25,
+    vy:Math.sin(tangent)*(0.15+Math.random()*.8)*force+(Math.random()-.5)*.25,
+    r:.6+Math.random()*3.3*force,life:.35+Math.random()*.65,side,tail:4+Math.floor(Math.random()*12)
+  });
+  if(hparts.length>900)hparts.splice(0,120);
+}
+function heroWave(side=1,power=1){waves.push({r:40,a:.45,side,power});if(waves.length>12)waves.shift()}
+function drawHero(){
+  hctx.fillStyle="rgba(2,4,7,.22)";hctx.fillRect(0,0,HW,HH);
+  const cx=HW/2,cy=HH/2,maxR=Math.min(HW,HH)*.46;
+  // radar rings
+  hctx.lineWidth=1;
+  for(let r=52;r<maxR;r+=52){hctx.beginPath();hctx.arc(cx,cy,r,0,Math.PI*2);hctx.strokeStyle="rgba(95,165,190,.075)";hctx.stroke()}
+  for(let k=0;k<16;k++){let a=k/16*Math.PI*2;hctx.beginPath();hctx.moveTo(cx+Math.cos(a)*48,cy+Math.sin(a)*48);hctx.lineTo(cx+Math.cos(a)*maxR,cy+Math.sin(a)*maxR);hctx.strokeStyle="rgba(90,155,180,.035)";hctx.stroke()}
+  // dynamic waves
+  for(const w of waves){hctx.beginPath();hctx.arc(cx,cy,w.r,0,Math.PI*2);hctx.strokeStyle=w.side>0?`rgba(105,255,185,${w.a})`:`rgba(255,105,140,${w.a})`;hctx.lineWidth=1.3*w.power;hctx.stroke();w.r+=1.5+2*w.power;w.a*=.974}
+  waves=waves.filter(w=>w.a>.025&&w.r<maxR*1.25);
+  // particles with velocity tails
+  for(const p of hparts){
+    const dx=p.x-cx,dy=p.y-cy,d=Math.hypot(dx,dy)||1;
+    const spin=(p.side>0?.006:-.006);
+    p.vx+=(-dy/d)*spin+(Math.random()-.5)*.004;p.vy+=(dx/d)*spin+(Math.random()-.5)*.004;
+    p.x+=p.vx;p.y+=p.vy;p.life*=.994;
+    hctx.beginPath();hctx.moveTo(p.x-p.vx*p.tail,p.y-p.vy*p.tail);hctx.lineTo(p.x,p.y);
+    hctx.strokeStyle=p.side>0?`rgba(105,255,185,${.10+.55*p.life})`:`rgba(255,105,140,${.10+.55*p.life})`;hctx.lineWidth=Math.max(.5,p.r*.48);hctx.stroke();
+    hctx.beginPath();hctx.arc(p.x,p.y,p.r,0,Math.PI*2);hctx.fillStyle=p.side>0?`rgba(110,255,188,${.18+.75*p.life})`:`rgba(255,110,145,${.18+.75*p.life})`;hctx.fill();
+  }
+  hparts=hparts.filter(p=>p.life>.035&&p.x>-60&&p.x<HW+60&&p.y>-60&&p.y<HH+60);
+  while(hparts.length<180)chaosParticle(Math.random()>.43?1:-1,.5+Math.random()*.8);
+  requestAnimationFrame(drawHero);
+}
+drawHero();
+
+function updateHero(){
+  const n=Object.values(venueState).filter(Boolean).length;
+  $("heroEvents").textContent=events.toLocaleString()+" EVENTS";
+  $("heroSymbols").textContent=syms.size.toLocaleString()+" SYMBOLS";
+  $("heroVenues").textContent=n+"/5 VENUES";
+  $("heroFlow").textContent=$("pressure").textContent;
+  $("heroRegime").textContent=$("regime").textContent;
+  $("heroLiq").textContent=usd(liqValue);
+  $("heroAnomaly").textContent=Math.floor(hparts.filter(p=>p.r>2.6&&p.life>.25).length/7);
+  $("heroSignal").textContent=$("signal").textContent;
+  $("heroConfidence").textContent=$("brainState").textContent==="ACTIVE"?$("confidence").textContent+" CONFIDENCE":"WARMING UP";
+  $("heroSignal").style.color=$("signal").classList.contains("long")?"var(--good)":$("signal").classList.contains("short")||$("signal").classList.contains("kill")?"var(--bad)":"var(--warn)";
+}
+setInterval(updateHero,500);
 
 startBinanceSpot();startFutures();startCoinbase();startKraken();startOkx();
 setInterval(()=>{const now=performance.now(),dt=(now-lastT)/1000,r=dt?(events-lastEvents)/dt:0;$("rate").textContent=r.toFixed(0)+" events/s";lastEvents=events;lastT=now;$("utc").textContent=new Date().toISOString().replace("T"," ").slice(0,19)+" UTC";if(px.BTC)markToMarket(px.BTC)},1000);
