@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#020407"/>
+<meta name="description" content="Live global crypto market chaos map"/>
+<link rel="manifest" href="./manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="./icons/icon-192.png"/>
+<link rel="stylesheet" href="./style.css"/>
+<title>GLOBAL CRYPTO CHAOS</title>
+</head>
+<body>
+<canvas id="field"></canvas>
+
+<header>
+  <div class="brand">⌬ GLOBAL CRYPTO CHAOS</div>
+  <div class="status"><span id="masterDot"></span><b id="masterStatus">CONNECTING</b><span id="utc"></span></div>
+</header>
+
+<section class="panel global">
+  <div class="title">GLOBAL CRYPTO FIELD</div>
+  <div class="big" id="marketCap">—</div>
+  <div class="metric"><span>24H VOLUME</span><b id="volume24h">—</b></div>
+  <div class="metric"><span>BTC DOM</span><b id="btcDom">—</b></div>
+  <div class="metric"><span>ETH DOM</span><b id="ethDom">—</b></div>
+  <div class="metric"><span>BTC</span><b id="btc">—</b></div>
+  <div class="metric"><span>ETH</span><b id="eth">—</b></div>
+  <div class="tiny" id="aggregateStamp">GLOBAL AGGREGATE: WAITING</div>
+</section>
+
+<section class="panel engine">
+  <div class="title">CHAOS ENGINE</div>
+  <div class="metric"><span>FLOW PRESSURE</span><b id="pressure">SCANNING</b></div>
+  <div class="metric"><span>MARKET PULSE</span><b id="pulse">—</b></div>
+  <div class="metric"><span>ANOMALY CLUSTERS</span><b id="clusters">0</b></div>
+  <div class="metric"><span>LIVE SYMBOLS</span><b id="symbols">0</b></div>
+  <div class="metric"><span>EVENT RATE</span><b id="rate">0/s</b></div>
+  <div class="metric"><span>LIQUIDATIONS</span><b id="liqCount">0</b></div>
+  <div class="metric"><span>LIQ VALUE</span><b id="liqValue">$0</b></div>
+</section>
+
+<section class="panel venues">
+  <div class="title">LIVE VENUES</div>
+  <div class="venue"><span>BINANCE SPOT</span><i id="v-binance">…</i></div>
+  <div class="venue"><span>BINANCE FUTURES</span><i id="v-futures">…</i></div>
+  <div class="venue"><span>COINBASE</span><i id="v-coinbase">…</i></div>
+  <div class="venue"><span>KRAKEN</span><i id="v-kraken">…</i></div>
+  <div class="venue"><span>OKX</span><i id="v-okx">…</i></div>
+  <div class="tiny">PUBLIC MARKET STREAMS · NO API KEY</div>
+</section>
+
+<section class="center">
+  <div class="eyebrow">LIVE MARKET FIELD</div>
+  <div class="signal" id="signal">SEARCHING</div>
+  <div class="chain">CHAOS → CLUSTER → ANOMALY → SIGNAL</div>
+</section>
+
+<section class="tape" id="tape"></section>
+
+<footer>
+  <span>MARKET VISUALIZATION · HEURISTIC SIGNALS · NOT FINANCIAL ADVICE</span>
+  <span id="events">0 EVENTS</span>
+</footer>
+
+<button id="install" class="install hidden">INSTALL APP</button>
+<script src="./app.js" defer></script>
+</body></html>
