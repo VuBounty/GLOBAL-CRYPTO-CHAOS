@@ -4,84 +4,181 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="theme-color" content="#020407"/>
-<meta name="description" content="CHAOS Agent — autonomous multi-strategy crypto paper trading intelligence"/>
+<meta name="description" content="CHAOS Autonomous Trader — live multi-strategy crypto intelligence and paper execution"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="apple-touch-icon" href="./icons/icon-192.png"/>
 <link rel="stylesheet" href="./style.css"/>
-<title>CHAOS AGENT</title>
+<title>CHAOS AUTONOMOUS TRADER</title>
 </head>
 <body>
 <canvas id="field"></canvas>
-<header>
-  <div class="brand">⌬ CHAOS AGENT <span class="tag">PAPER v1.0</span></div>
-  <div class="status"><span id="masterDot"></span><b id="masterStatus">CONNECTING</b><span id="utc"></span></div>
+<div class="veil"></div>
+
+<header class="topbar">
+  <div>
+    <div class="brand">⌬ CHAOS <span>AUTONOMOUS TRADER</span></div>
+    <div class="subbrand">LIVE MARKET INTELLIGENCE · PAPER EXECUTION · ZERO REAL ORDERS</div>
+  </div>
+  <div class="topright">
+    <div class="feedstate"><span id="masterDot"></span><b id="masterStatus">CONNECTING</b></div>
+    <div id="utc">— UTC</div>
+  </div>
 </header>
 
-<section class="panel global">
-  <div class="title">GLOBAL CRYPTO FIELD</div>
-  <div class="big" id="marketCap">—</div>
-  <div class="metric"><span>24H VOLUME</span><b id="volume24h">—</b></div>
-  <div class="metric"><span>BTC DOM</span><b id="btcDom">—</b></div>
-  <div class="metric"><span>ETH DOM</span><b id="ethDom">—</b></div>
-  <div class="metric"><span>BTC</span><b id="btc">—</b></div>
-  <div class="metric"><span>ETH</span><b id="eth">—</b></div>
-  <div class="tiny" id="aggregateStamp">GLOBAL AGGREGATE: WAITING</div>
-</section>
+<main class="shell">
+  <section class="triptych">
+    <article class="card market-card">
+      <div class="cardhead">
+        <span>LIVE MARKET</span><small>GLOBAL FIELD</small>
+      </div>
+      <div class="pricegrid">
+        <div><label>BTC</label><strong id="btc">—</strong><em id="btcDelta">—</em></div>
+        <div><label>ETH</label><strong id="eth">—</strong><em id="ethDelta">—</em></div>
+        <div><label>SOL</label><strong id="sol">—</strong><em id="solDelta">—</em></div>
+      </div>
+      <div class="statrow"><span>Global Market Cap</span><b id="marketCap">—</b></div>
+      <div class="statrow"><span>24H Volume</span><b id="volume24h">—</b></div>
+      <div class="statrow"><span>BTC Dominance</span><b id="btcDom">—</b></div>
+      <div class="statrow"><span>ETH Dominance</span><b id="ethDom">—</b></div>
+      <div class="mini">
+        <span id="symbols">0 symbols</span>
+        <span id="rate">0 events/s</span>
+        <span id="liqValue">$0 liquidations</span>
+      </div>
+    </article>
 
-<section class="panel engine">
-  <div class="title">MARKET BRAIN</div>
-  <div class="metric"><span>REGIME</span><b id="regime">WARMING UP</b></div>
-  <div class="metric"><span>FLOW PRESSURE</span><b id="pressure">SCANNING</b></div>
-  <div class="metric"><span>MARKET PULSE</span><b id="pulse">—</b></div>
-  <div class="metric"><span>ANOMALY</span><b id="clusters">0</b></div>
-  <div class="metric"><span>LIVE SYMBOLS</span><b id="symbols">0</b></div>
-  <div class="metric"><span>EVENT RATE</span><b id="rate">0/s</b></div>
-  <div class="metric"><span>LIQ VALUE</span><b id="liqValue">$0</b></div>
-</section>
+    <article class="card brain-card">
+      <div class="cardhead">
+        <span>AGENT BRAIN</span><small id="brainState">WARMING UP</small>
+      </div>
+      <div class="brainhero">
+        <div class="decision-label">META-AGENT DECISION</div>
+        <div id="signal" class="signal wait">OBSERVE</div>
+        <div id="decision" class="decision">Collecting enough live evidence…</div>
+      </div>
+      <div class="brainstats">
+        <div><span>REGIME</span><b id="regime">WARMING UP</b></div>
+        <div><span>CONFIDENCE</span><b id="confidence">—</b></div>
+        <div><span>FLOW</span><b id="pressure">SCANNING</b></div>
+        <div><span>PULSE</span><b id="pulse">—</b></div>
+      </div>
+      <div class="pipeline">DATA <i>→</i> REGIME <i>→</i> STRATEGY SWARM <i>→</i> EDGE <i>→</i> RISK <i>→</i> EXECUTION</div>
+    </article>
 
-<section class="panel venues">
-  <div class="title">LIVE VENUES</div>
-  <div class="venue"><span>BINANCE SPOT</span><i id="v-binance">…</i></div>
-  <div class="venue"><span>BINANCE FUTURES</span><i id="v-futures">…</i></div>
-  <div class="venue"><span>COINBASE</span><i id="v-coinbase">…</i></div>
-  <div class="venue"><span>KRAKEN</span><i id="v-kraken">…</i></div>
-  <div class="venue"><span>OKX</span><i id="v-okx">…</i></div>
-  <div class="tiny">PUBLIC MARKET STREAMS · NO EXCHANGE KEY</div>
-</section>
+    <article class="card portfolio-card">
+      <div class="cardhead">
+        <span>PORTFOLIO</span><small>PAPER ACCOUNT</small>
+      </div>
+      <div class="equity" id="equity">$10,000.00</div>
+      <div class="pnlbig" id="pnl">$0.00</div>
+      <div class="statrow"><span>Max Drawdown</span><b id="drawdown">0.00%</b></div>
+      <div class="statrow"><span>Trades</span><b id="tradeCount">0</b></div>
+      <div class="statrow"><span>Win Rate</span><b id="winRate">—</b></div>
+      <div class="statrow"><span>Profit Factor</span><b id="profitFactor">—</b></div>
+      <div class="statrow"><span>Fees Paid</span><b id="feesPaid">$0.00</b></div>
+      <div class="riskbadge">RISK GOVERNOR · 0.25% / TRADE · 2% DAILY KILL</div>
+    </article>
+  </section>
 
-<section class="panel agent">
-  <div class="title">AUTONOMOUS PAPER AGENT</div>
-  <div class="metric"><span>CAPITAL</span><b id="capital">$10,000.00</b></div>
-  <div class="metric"><span>EQUITY</span><b id="equity">$10,000.00</b></div>
-  <div class="metric"><span>P&L</span><b id="pnl">$0.00</b></div>
-  <div class="metric"><span>MAX DD</span><b id="drawdown">0.00%</b></div>
-  <div class="metric"><span>TRADES</span><b id="tradeCount">0</b></div>
-  <div class="metric"><span>WIN RATE</span><b id="winRate">—</b></div>
-  <div class="metric"><span>PROFIT FACTOR</span><b id="profitFactor">—</b></div>
-  <div class="metric"><span>POSITION</span><b id="position">FLAT</b></div>
-  <div class="tiny">RISK GOVERNOR: 0.25% RISK/TRADE · 2% DAILY KILL SWITCH</div>
-</section>
+  <section class="strategy-section">
+    <div class="sectionhead">
+      <span>STRATEGY SWARM</span>
+      <small>independent models competing for capital</small>
+    </div>
+    <div class="strategy-grid">
+      <article class="strategy-card" data-k="momentum">
+        <div class="strategy-top"><b>MOMENTUM</b><strong id="sv-momentum">0.00</strong></div>
+        <div class="bar"><i id="sb-momentum"></i></div>
+        <p id="sd-momentum">Waiting for directional persistence.</p>
+      </article>
+      <article class="strategy-card" data-k="reversion">
+        <div class="strategy-top"><b>MEAN REVERSION</b><strong id="sv-reversion">0.00</strong></div>
+        <div class="bar"><i id="sb-reversion"></i></div>
+        <p id="sd-reversion">Waiting for short-horizon dislocation.</p>
+      </article>
+      <article class="strategy-card" data-k="liquidation">
+        <div class="strategy-top"><b>LIQUIDATION REVERSAL</b><strong id="sv-liquidation">0.00</strong></div>
+        <div class="bar"><i id="sb-liquidation"></i></div>
+        <p id="sd-liquidation">Watching forced-order imbalance.</p>
+      </article>
+      <article class="strategy-card" data-k="divergence">
+        <div class="strategy-top"><b>CROSS-VENUE DIVERGENCE</b><strong id="sv-divergence">0.00</strong></div>
+        <div class="bar"><i id="sb-divergence"></i></div>
+        <p id="sd-divergence">Comparing multi-exchange price dispersion.</p>
+      </article>
+    </div>
+  </section>
 
-<section class="center">
-  <div class="eyebrow">META-AGENT DECISION</div>
-  <div class="signal" id="signal">OBSERVE</div>
-  <div class="decision" id="decision">Collecting enough live evidence…</div>
-  <div class="chain">DATA → REGIME → STRATEGY SWARM → EDGE → RISK → EXECUTION</div>
-</section>
+  <section class="middle-grid">
+    <article class="card opportunity">
+      <div class="cardhead">
+        <span>BEST OPPORTUNITY</span><small id="oppStatus">NO QUALIFIED EDGE</small>
+      </div>
+      <div class="opp-symbol" id="oppSymbol">BTC / USD</div>
+      <div class="opp-side" id="oppSide">WAIT</div>
+      <div class="opp-grid">
+        <div><span>Raw Edge</span><b id="rawEdge">—</b></div>
+        <div><span>Fees</span><b id="feeEdge">—</b></div>
+        <div><span>Slippage</span><b id="slipEdge">—</b></div>
+        <div><span>Net Edge</span><b id="netEdge">—</b></div>
+        <div><span>Confidence</span><b id="oppConf">—</b></div>
+        <div><span>Risk</span><b id="oppRisk">0.25%</b></div>
+      </div>
+      <div class="why" id="oppWhy">The agent will remain flat until expected edge stays positive after modeled costs.</div>
+    </article>
 
-<section class="strategybar">
-  <span id="s-momentum">MOMENTUM —</span>
-  <span id="s-reversion">REVERSION —</span>
-  <span id="s-liquidation">LIQ REVERSAL —</span>
-  <span id="s-divergence">DIVERGENCE —</span>
-</section>
+    <article class="card position-card">
+      <div class="cardhead"><span>OPEN POSITION</span><small id="positionState">FLAT</small></div>
+      <div class="position-main" id="position">NO POSITION</div>
+      <div class="position-grid">
+        <div><span>Entry</span><b id="posEntry">—</b></div>
+        <div><span>Mark</span><b id="posMark">—</b></div>
+        <div><span>Stop</span><b id="posStop">—</b></div>
+        <div><span>Take</span><b id="posTake">—</b></div>
+        <div><span>Unrealized</span><b id="posUnrealized">—</b></div>
+        <div><span>Age</span><b id="posAge">—</b></div>
+      </div>
+    </article>
 
-<section class="tape" id="tape"></section>
-<footer>
-  <span>PAPER TRADING · FEE + SLIPPAGE MODEL · NO REAL ORDERS</span>
-  <span id="events">0 EVENTS</span>
-</footer>
-<button id="reset" class="control">RESET PAPER</button>
-<button id="install" class="install hidden">INSTALL APP</button>
+    <article class="card proof-card">
+      <div class="cardhead"><span>PROOF / BENCHMARK</span><small>FORWARD PAPER</small></div>
+      <div class="benchmark-head">
+        <span>AGENT</span><b id="agentReturn">0.00%</b>
+        <span>BUY & HOLD BTC</span><b id="holdReturn">0.00%</b>
+      </div>
+      <div class="benchrow"><span>Expectancy / Trade</span><b id="expectancy">—</b></div>
+      <div class="benchrow"><span>Sharpe (indicative)</span><b id="sharpe">—</b></div>
+      <div class="benchrow"><span>Max DD</span><b id="benchDD">0.00%</b></div>
+      <div class="benchrow"><span>Qualified Trades</span><b id="qualified">0</b></div>
+      <div class="proofnote">No superiority claim until this forward record demonstrates it.</div>
+    </article>
+  </section>
+
+  <section class="bottom-grid">
+    <article class="card journal-card">
+      <div class="cardhead"><span>LIVE TRADE JOURNAL</span><small id="events">0 EVENTS</small></div>
+      <div id="journal" class="journal"></div>
+    </article>
+
+    <article class="card venue-card">
+      <div class="cardhead"><span>VENUE HEALTH</span><small>PUBLIC STREAMS</small></div>
+      <div class="venues">
+        <div><span>BINANCE SPOT</span><i id="v-binance">…</i></div>
+        <div><span>BINANCE FUTURES</span><i id="v-futures">…</i></div>
+        <div><span>COINBASE</span><i id="v-coinbase">…</i></div>
+        <div><span>KRAKEN</span><i id="v-kraken">…</i></div>
+        <div><span>OKX</span><i id="v-okx">…</i></div>
+      </div>
+      <div class="venue-foot"><span id="aggregateStamp">GLOBAL AGGREGATE: WAITING</span><span id="clusters">0 anomaly clusters</span></div>
+    </article>
+  </section>
+</main>
+
+<div class="floating">
+  <button id="reset" class="control">RESET PAPER</button>
+  <button id="install" class="control hidden">INSTALL APP</button>
+</div>
+
 <script src="./app.js" defer></script>
-</body></html>
+</body>
+</html>
